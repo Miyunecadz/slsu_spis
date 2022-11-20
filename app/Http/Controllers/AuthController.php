@@ -1,0 +1,97 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Admin;
+use App\Models\Scholar;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
+
+class AuthController extends Controller
+{
+    public function login(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'username' => 'string|required',
+            'password' => 'string'
+        ],[
+            'username.required' => 'Email/Student-ID is required'
+        ]);
+
+        if($validator->fails())
+        {
+            return response()->json([
+                'errors' => $validator->errors()
+            ]);
+        }
+
+        if(!Auth::attempt($request->only(['username', 'password'])))
+        {
+            return response()->json([
+                'status' => false,
+                'message' => 'Email and Password does not match with our record.'
+            ], 401);
+        }
+
+        $user = auth()->user();
+
+        return response()->json([
+            'status' => true,
+            'message' => 'User successfully logged in.',
+            'access_token' => $user->createToken("api_token")->plainTextToken,
+            'token_type' => 'bearer',
+            'user' => $this->getUser()
+        ]);
+
+    }
+
+    public function logout(Request $request)
+    {
+        $request->user()->currentAccessToken()->delete();
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Successfully logged out!'
+        ]);
+    }
+
+    private function getUser()
+    {
+        $user = request()->user();
+
+        if($user->account_type == 1)
+        {
+            return Admin::
+                join('users', 'users.user_id', '=', 'admins.id')
+                ->select([
+                    'account_type',
+                    'username',
+                    'first_name',
+                    'last_name',
+                    'admins.created_at'
+                ])
+                ->find($user->user_id);
+        }
+
+        return Scholar::
+            join('users', 'users.user_id', '=', 'scholars.id')
+            ->join('scholarships', 'scholarships.id', '=', 'scholars.scholarship_id')
+            ->select([
+                'first_name',
+                'middle_name',
+                'last_name',
+                'phone_number',
+                'id_number',
+                'department',
+                'course',
+                'major',
+                'year_level',
+                'email',
+                'scholarships.scholarship_name',
+                'scholars.created_at'
+            ])
+            ->find($user->user_id);
+    }
+
+}

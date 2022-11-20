@@ -13,6 +13,16 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        // \App\Models\User::factory(10)->create();
+        $this->call([
+            ScholarshipSeeder::class,
+        ]);
+
+        if(config('app.debug') == true)
+        {
+            $this->call([
+                DummyAdminSeeder::class,
+                DummyScholarSeeder::class
+            ]);
+        }
     }
 }
