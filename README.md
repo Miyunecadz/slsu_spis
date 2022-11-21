@@ -6,10 +6,10 @@ Hello fellow developers!
 
 | Need Token  | Method      | URL                    | Description                            |
 | ----------- | ----------- | ---------------------- | -------------------------------------- |
-| NO          | POST        | /api/auth/login        | Authentication user                    |
+| NO          | POST        | /api/auth/login        | Authenticate user                      |
 | YES         | POST        | /api/auth/logout       | Logout user                            |
 | YES         | GET         | /api/scholars          | Return list of scholars                |
-| YES         | POST        | /api/scholars         | Register scholars                       |
+| YES         | POST        | /api/scholars          | Register scholars                      |
 | YES         | GET         | /api/scholars/{id}     | Return specific of scholars            |
 
 
