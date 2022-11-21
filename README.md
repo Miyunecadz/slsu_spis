@@ -11,6 +11,7 @@ Hello fellow developers!
 | YES         | GET         | /api/scholars          | Return list of scholars                |
 | YES         | POST        | /api/scholars          | Register scholars                      |
 | YES         | GET         | /api/scholars/{id}     | Return specific of scholars            |
+| NO          | POST        | /api/auth/password-request| Return specific of scholars         |
 
 
 For SMS, need to register in Twilio (free trial is okay) and set it to .env file the following
