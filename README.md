@@ -16,5 +16,7 @@ Hello fellow developers!
 For SMS, need to register in Twilio (free trial is okay) and set it to .env file the following
 
 TWILIO_SID={SID provided by Twilio}
+
 TWILIO_TOKEN={Token provided by Twilio}
+
 TWILIO_FROM={Number provided by Twilio}
