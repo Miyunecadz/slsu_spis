@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\SMSHelper;
 use App\Models\Scholar;
 use App\Models\Scholarship;
+use App\Models\User;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 
@@ -39,9 +41,9 @@ class ScholarController extends Controller
             'first_name' => 'required|string',
             'middle_name' => 'string',
             'last_name' => 'required|string',
-            'phone_number' => 'required|numeric|max:10',
-            'email' => 'required|email',
-            'id_number' => 'required|max:12',
+            'phone_number' => 'required|numeric',
+            'email' => 'required|email|unique:scholars',
+            'id_number' => 'required|max:12|unique:scholars',
             'department' => 'required|string',
             'course' => 'required|string',
             'major' => 'required|string',
@@ -56,9 +58,9 @@ class ScholarController extends Controller
             ]);
         }
 
-        $scholarship_id = Scholarship::select('id')->where('scholarship_name', 'like', "$request->scholarship%")->first();
+        $scholarship = Scholarship::select('id')->where('scholarship_name', 'like', "$request->scholarship%")->first();
 
-        Scholar::create([
+        $scholar = Scholar::create([
             'first_name' => $request->input('first_name'),
             'middle_name' => $request->input('middle_name'),
             'last_name' => $request->input('last_name'),
@@ -69,8 +71,19 @@ class ScholarController extends Controller
             'course' => $request->input('course'),
             'major' => $request->input('major'),
             'year_level' => $request->input('year_level'),
-            'scholarship_id' => $scholarship_id
+            'scholarship_id' => $scholarship->id
         ]);
+
+        $password = "slsu-spis-". strtolower($scholar->last_name);
+
+        User::create([
+            'account_type' => 2,
+            'user_id' => $scholar->id,
+            'username' => $scholar->id_number,
+            'password' => bcrypt($password)
+        ]);
+
+        SMSHelper::send($scholar->phone_number, "Hello $scholar->first_name,This is to inform you that your successfully registered to SLSU SPIS your temporary password: ". $password);
 
         return response()->json([
             'status' => true,
