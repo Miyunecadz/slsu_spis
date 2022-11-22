@@ -22,7 +22,7 @@ Route::prefix('auth')->group(function(){
     Route::controller(AuthController::class)->group(function(){
         Route::post('/login', 'login');
 
-        Route::middleware('auth:sanctum')->group(function(){
+        Route::middleware('auth')->group(function(){
             Route::post('/logout', 'logout');
         });
     });
@@ -34,16 +34,16 @@ Route::prefix('auth')->group(function(){
 
 
 
-// Route::middleware('auth:sanctum')->group(function(){
+Route::middleware('auth')->group(function(){
     Route::prefix('scholars')->controller(ScholarController::class)->group(function(){
         Route::get('/', 'index');
         Route::get('/{id}', 'show');
         Route::post('/', 'store');
     });
-// });
-
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
 });
+
+// Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+//     return $request->user();
+// });
 
 

@@ -26,7 +26,7 @@ class AuthController extends Controller
             ]);
         }
 
-        if(!Auth::attempt($request->only(['username', 'password'])))
+        if(!$token = Auth::setTTL(1440)->attempt($request->only(['username', 'password'])))
         {
             return response()->json([
                 'status' => false,
@@ -39,7 +39,7 @@ class AuthController extends Controller
         return response()->json([
             'status' => true,
             'message' => 'User successfully logged in.',
-            'access_token' => $user->createToken("api_token")->plainTextToken,
+            'access_token' => $token,
             'token_type' => 'bearer',
             'user' => $this->getUser()
         ]);
@@ -48,7 +48,7 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
-        $request->user()->currentAccessToken()->delete();
+        auth()->logout(true);
 
         return response()->json([
             'status' => true,
