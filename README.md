@@ -19,7 +19,7 @@ Run generate APP key
 Add JWT secret
 -       php artisan jwt:secret
 
-###Migrating the database
+### Migrating the database
 First configure the database. You can find the credentials in **.env** file.
 -     DB_CONNECTION=mysql
 -     DB_HOST=127.0.0.1
