@@ -31,7 +31,7 @@ First configure the database. You can find the credentials in **.env** file.
 Create database in your mysql server, named it **slsu_spis**. (Database name should be the same as the DB_DATABASE value of your .env)
 
 Run command
-`php artisan migrate --seed`
+-       php artisan migrate --seed
 This will also migrate dummy data.
 
 Note: Make sure the **slsu_spis** app is inside the htdocs or www of your apache server.
