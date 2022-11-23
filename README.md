@@ -4,24 +4,24 @@ Hello fellow developers!
 
 ### Building for development
 First you must clone the repository.
-`git clone https://github.com/Miyunecadz/slsu_spis.git`
+-       git clone https://github.com/Miyunecadz/slsu_spis.git
 
 Change directory to **slsu_spis** folder.
 Create a copy of **.env.example** and rename it to **.env**
 
 Run the composer command (be sure that composer is installed in your machine)
-`composer install`
+-       composer install
 This command will install the dependencies for development and production.
 
 Run generate APP key
-`php artisan key:generate`
+-       php artisan key:generate
 
 Add JWT secret
-`php artisan jwt:secret`
+-       php artisan jwt:secret
 
 ###Migrating the database
 First configure the database. You can find the credentials in **.env** file.
-- DB_CONNECTION=mysql
+-     DB_CONNECTION=mysql
 -     DB_HOST=127.0.0.1
 -     DB_PORT=3306
 -     DB_DATABASE=slsu_spis
