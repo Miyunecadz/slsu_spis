@@ -62,7 +62,7 @@ class AuthController extends Controller
 
         if($user->account_type == 1)
         {
-            return Admin::
+            $user = Admin::
                 join('users', 'users.user_id', '=', 'admins.id')
                 ->select([
                     'account_type',
@@ -71,13 +71,16 @@ class AuthController extends Controller
                     'last_name',
                     'admins.created_at'
                 ])
+                ->where('account_type', 1)
                 ->find($user->user_id);
+            return $user;
         }
 
-        return Scholar::
+        $user = Scholar::
             join('users', 'users.user_id', '=', 'scholars.id')
             ->join('scholarships', 'scholarships.id', '=', 'scholars.scholarship_id')
             ->select([
+                'account_type',
                 'first_name',
                 'middle_name',
                 'last_name',
@@ -91,7 +94,9 @@ class AuthController extends Controller
                 'scholarships.scholarship_name',
                 'scholars.created_at'
             ])
+            ->where('account_type', 2)
             ->find($user->user_id);
+        return $user;
     }
 
 }
