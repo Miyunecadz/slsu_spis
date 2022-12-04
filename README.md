@@ -46,6 +46,8 @@ Note: Make sure the **slsu_spis** app is inside the htdocs or www of your apache
 | YES         | GET         | /api/scholars          | Return list of scholars                |
 | YES         | POST        | /api/scholars          | Register scholars                      |
 | YES         | GET         | /api/scholars/{id}     | Return specific of scholars            |
+| YES         | PUT         | /api/scholars/{id}     | Update scholar information             |
+| YES         | DELETE      | /api/scholars/{id}     | Delete specific scholar information    |
 | NO          | POST        | /api/auth/password-request| Return code and send sms            |
 
 
