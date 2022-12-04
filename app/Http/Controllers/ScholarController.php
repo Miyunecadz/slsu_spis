@@ -8,6 +8,7 @@ use App\Models\Scholarship;
 use App\Models\User;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class ScholarController extends Controller
 {
@@ -120,6 +121,77 @@ class ScholarController extends Controller
         return response()->json([
             'status' => true,
             'scholar' => $scholar
+        ]);
+    }
+
+    public function update(Request $request)
+    {
+        $parameters = $request->all();
+        $parameters['id'] = $request->id;
+
+        $validator = Validator::make($parameters, [
+            'id' => Rule::exists('scholars')->where(function ($query) use ($parameters) {
+                return $query->where('id_number', $parameters['id']);
+            }),
+            'first_name' => 'string',
+            'middle_name' => 'string',
+            'last_name' => 'string',
+            'phone_number' => 'numeric',
+            'email' => 'email|unique:scholars',
+            'id_number' => 'max:12|unique:scholars',
+            'department' => 'string',
+            'course' => 'string',
+            'major' => 'string',
+            'year_level' => 'string',
+            'scholarship' => 'string',
+        ]);
+
+        if($validator->fails())
+        {
+            return response()->json([
+                'status' => false,
+                'errors' => $validator->errors()
+            ]);
+        }
+
+        $scholar = Scholar::where('id_number', $parameters['id'])->first();
+        $updateResult = $scholar->update($parameters);
+
+        if(!$updateResult) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Unable to update scholar information'
+            ]);
+        }
+
+        return response()->json([
+            'status' => true,
+            'messsage' => "Scholar ID Number: " . $parameters['id'] . " information has been updated"
+        ]);
+    }
+
+    public function destroy($id)
+    {
+        $scholar = Scholar::where('id_number', $id)->first();
+
+        if(!$scholar) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Scholar not found in our database'
+            ]);
+        }
+
+        $deleteResult = $scholar->delete();
+        if(!$deleteResult) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Unable to delete scholar information'
+            ]);
+        }
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Scholar ID Number: '. $id . ' has been deleted!'
         ]);
     }
 }
