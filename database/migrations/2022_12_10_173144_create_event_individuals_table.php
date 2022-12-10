@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateUsersTable extends Migration
+class CreateEventIndividualsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,13 +13,10 @@ class CreateUsersTable extends Migration
      */
     public function up()
     {
-        Schema::create('users', function (Blueprint $table) {
+        Schema::create('event_individuals', function (Blueprint $table) {
             $table->id();
-            $table->smallInteger('account_type')->comment("1 - Admin | 2 - Student");
-            $table->unsignedBigInteger('user_id');
-            $table->string('username');
-            $table->string('password');
-            $table->date('password_modified')->nullable();
+            $table->unsignedBigInteger('event_id');
+            $table->unsignedBigInteger('scholar_id');
             $table->timestamps();
         });
     }
@@ -31,6 +28,6 @@ class CreateUsersTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('users');
+        Schema::dropIfExists('event_individuals');
     }
 }

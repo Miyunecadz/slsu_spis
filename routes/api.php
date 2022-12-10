@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\EventController;
 use App\Http\Controllers\PasswordController;
 use App\Http\Controllers\ScholarController;
 use Illuminate\Http\Request;
@@ -40,6 +41,12 @@ Route::middleware('auth')->group(function(){
         Route::post('/', 'store');
         Route::put('/{id_number}', 'update');
         Route::delete('/{id_number}', 'destroy');
+    });
+
+    Route::prefix('events')->controller(EventController::class)->group(function () {
+        Route::get('/', 'index');
+        Route::post('/', 'store');
+        Route::get('/{id}', 'show');
     });
 });
 

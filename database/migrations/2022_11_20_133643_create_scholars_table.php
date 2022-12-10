@@ -27,6 +27,7 @@ class CreateScholarsTable extends Migration
             $table->unsignedSmallInteger('scholarship_id');
             $table->string('email');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
