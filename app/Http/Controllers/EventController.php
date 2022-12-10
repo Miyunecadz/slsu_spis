@@ -45,7 +45,8 @@ class EventController extends Controller
                 $query->where('details', $request->details);
             })
             ->when($request->has('id_number'), function ($query) use ($request) {
-                $query->join('scholars', 'events.scholar_id', 'scholars.id')
+                $query->join('event_individuals', 'event_individuals.event_id', 'events.id')
+                    ->join('scholars', 'event_individuals.scholar_id', 'scholars.id')
                     ->where('id_number', $request->id_number);
             })
             ->paginate(10);
