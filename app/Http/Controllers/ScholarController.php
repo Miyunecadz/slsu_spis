@@ -92,7 +92,7 @@ class ScholarController extends Controller
         ]);
     }
 
-    public function show($id)
+    public function show($id_number)
     {
         $scholar = Scholar::join('scholarships', 'scholarships.id', '=', 'scholars.scholarship_id')
         ->select([
@@ -108,7 +108,7 @@ class ScholarController extends Controller
             'email',
             'scholarships.scholarship_name',
             'scholars.created_at'
-        ])->find($id);
+        ])->where('id_number', $id_number);
 
         if(!$scholar)
         {
@@ -127,7 +127,7 @@ class ScholarController extends Controller
     public function update(Request $request)
     {
         $parameters = $request->all();
-        $parameters['id'] = $request->id;
+        $parameters['id'] = $request->id_number;
 
         $validator = Validator::make($parameters, [
             'id' => Rule::exists('scholars')->where(function ($query) use ($parameters) {
@@ -170,9 +170,9 @@ class ScholarController extends Controller
         ]);
     }
 
-    public function destroy($id)
+    public function destroy($id_number)
     {
-        $scholar = Scholar::where('id_number', $id)->first();
+        $scholar = Scholar::where('id_number', $id_number)->first();
 
         if(!$scholar) {
             return response()->json([
@@ -191,7 +191,7 @@ class ScholarController extends Controller
 
         return response()->json([
             'status' => true,
-            'message' => 'Scholar ID Number: '. $id . ' has been deleted!'
+            'message' => 'Scholar ID Number: '. $id_number . ' has been deleted!'
         ]);
     }
 }

@@ -22,6 +22,7 @@ class AuthController extends Controller
         if($validator->fails())
         {
             return response()->json([
+                'status' => false,
                 'errors' => $validator->errors()
             ]);
         }
@@ -31,7 +32,7 @@ class AuthController extends Controller
             return response()->json([
                 'status' => false,
                 'message' => 'Email and Password does not match with our record.'
-            ], 401);
+            ]);
         }
 
         $user = auth()->user();
@@ -65,7 +66,8 @@ class AuthController extends Controller
             $user = Admin::
                 join('users', 'users.user_id', '=', 'admins.id')
                 ->select([
-                    'account_type',
+                    'admins.id',
+                    'users.account_type',
                     'username',
                     'first_name',
                     'last_name',
@@ -80,7 +82,8 @@ class AuthController extends Controller
             join('users', 'users.user_id', '=', 'scholars.id')
             ->join('scholarships', 'scholarships.id', '=', 'scholars.scholarship_id')
             ->select([
-                'account_type',
+                'scholars.id',
+                'users.account_type',
                 'first_name',
                 'middle_name',
                 'last_name',

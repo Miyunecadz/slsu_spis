@@ -36,10 +36,10 @@ Route::prefix('auth')->group(function(){
 Route::middleware('auth')->group(function(){
     Route::prefix('scholars')->controller(ScholarController::class)->group(function(){
         Route::get('/', 'index');
-        Route::get('/{id}', 'show');
+        Route::get('/{id_number}', 'show');
         Route::post('/', 'store');
-        Route::put('/{id}', 'update');
-        Route::delete('/{id}', 'destroy');
+        Route::put('/{id_number}', 'update');
+        Route::delete('/{id_number}', 'destroy');
     });
 });
 
