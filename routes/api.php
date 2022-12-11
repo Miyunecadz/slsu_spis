@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\PasswordController;
 use App\Http\Controllers\ScholarController;
+use App\Http\Controllers\SMSBlastController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -48,6 +49,8 @@ Route::middleware('auth')->group(function(){
         Route::post('/', 'store');
         Route::get('/{id}', 'show');
     });
+
+    Route::post('/sms', SMSBlastController::class);
 });
 
 
