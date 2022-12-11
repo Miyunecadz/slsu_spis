@@ -22,7 +22,8 @@ class DatabaseSeeder extends Seeder
         {
             $this->call([
                 DummyAdminSeeder::class,
-                DummyScholarSeeder::class
+                DummyScholarSeeder::class,
+                DummyEventSeeder::class,
             ]);
         }
     }

@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Jobs\UpdateEvent;
-use App\Jobs\UpsertEvent;
+use App\Helpers\SMSHelper;
 use App\Models\Event;
 use App\Models\EventIndividual;
+use App\Models\Scholar;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Validator;
@@ -71,9 +71,18 @@ class EventController extends Controller
                 'errors' => $validator->errors()
             ]);
         }
+        $event = Event::create(Arr::except($request->all(), ['recipients']));
 
-        $event = Event::create(Arr::except($request->all), ['recipients']);
-        UpsertEvent::dispatch($request->all(), $event->id);
+        foreach($request->recipients as $recipient)
+        {
+            EventIndividual::create([
+                'event_id' => $event->id,
+                'scholar_id' => $recipient
+            ]);
+
+            $scholar = Scholar::find($recipient);
+            SMSHelper::send($scholar->phone_number, 'New Event has been posted! For more information check the event details.');
+        }
 
         return response()->json([
             'status' => true,
@@ -126,7 +135,17 @@ class EventController extends Controller
         }
 
         $event = Event::find($params['id'])->update($request->all());
-        UpdateEvent::dispatch($event->id, $request->recipients);
+        EventIndividual::where('event_id', $event->id)->delete();
+        foreach($request->recipients as $recipient)
+        {
+            EventIndividual::create([
+                'event_id' => $event->id,
+                'scholar_id' => $recipient
+            ]);
+
+            $scholar = Scholar::find($recipient);
+            SMSHelper::send($scholar->phone_number, 'Event has been posted! For more information check the event details.');
+        }
 
         return response()->json([
             'status' => true,

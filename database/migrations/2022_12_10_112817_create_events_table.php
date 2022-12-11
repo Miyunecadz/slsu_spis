@@ -18,7 +18,6 @@ class CreateEventsTable extends Migration
             $table->string('title');
             $table->date('event_start');
             $table->date('event_end');
-            $table->unsignedBigInteger('scholar_id');
             $table->text('details');
             $table->timestamps();
         });

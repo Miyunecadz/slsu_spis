@@ -13,7 +13,6 @@ class Event extends Model
         'title',
         'event_start',
         'event_end',
-        'scholar_id',
         'details'
     ];
 }
