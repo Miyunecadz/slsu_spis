@@ -13,4 +13,9 @@ class EventIndividual extends Model
         'event_id',
         'scholar_id'
     ];
+
+    public function event()
+    {
+        return $this->belongsTo(Event::class);
+    }
 }

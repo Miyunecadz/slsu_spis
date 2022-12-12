@@ -8,4 +8,10 @@ use Illuminate\Database\Eloquent\Model;
 class Scholarship extends Model
 {
     use HasFactory;
+
+    //added fillable
+    protected $fillable = [
+        'scholarship_name',
+        'scholarship_detail',
+    ];
 }

@@ -8,13 +8,15 @@ use App\Models\Scholarship;
 use App\Models\User;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 
 class ScholarController extends Controller
 {
 
-    public function index()
+    public function index(Request $request)
     {
+
         $scholars = Scholar::join('scholarships', 'scholarships.id', '=', 'scholars.scholarship_id')
             ->select([
                 'first_name',
@@ -29,12 +31,42 @@ class ScholarController extends Controller
                 'email',
                 'scholarships.scholarship_name',
                 'scholars.created_at'
-            ])->paginate(10);
+            ])
+            ->when($request->scholarName != '', function ($query) use ($request) {   //Added for search
+                $query->where('first_name', 'LIKE', "%$request->scholarName%")
+                ->orwhere('last_name', 'LIKE', "%$request->scholarName%");
+            })
+            ->when($request->scholarship != 0, function ($query) use ($request) {
+                $query->where('scholarship_id', "$request->scholarship");
+            })
+            ->paginate(10);
+
+
 
         return response()->json([
             $scholars
         ]);
     }
+
+
+    public function recipient()
+    {
+        $scholars = Scholar::join('scholarships', 'scholarships.id', '=', 'scholars.scholarship_id')
+        // ->select([
+        //     'scholars.id',
+        //     'first_name',
+        //     'last_name',
+        //     'id_number',
+        //     'scholarships.scholarship_name',
+        // ])->get();
+        ->select(DB::raw("CONCAT(scholars.id_number,' | ' ,scholars.first_name, ' ' ,scholars.last_name) AS display_name"), 'scholars.id', 'scholarships.scholarship_name')
+        ->get();
+
+        return response()->json(
+            $scholars
+        );
+    }
+
 
     public function store(Request $request)
     {
@@ -108,7 +140,7 @@ class ScholarController extends Controller
             'email',
             'scholarships.scholarship_name',
             'scholars.created_at'
-        ])->where('id_number', $id_number);
+        ])->where('id_number', $id_number)->get();
 
         if(!$scholar)
         {
@@ -130,15 +162,15 @@ class ScholarController extends Controller
         $parameters['id'] = $request->id_number;
 
         $validator = Validator::make($parameters, [
-            'id' => Rule::exists('scholars')->where(function ($query) use ($parameters) {
-                return $query->where('id_number', $parameters['id']);
-            }),
+            // 'id' => Rule::exists('scholars')->where(function ($query) use ($parameters) {
+            //     return $query->where('id_number', $parameters['id']);
+            // }),
             'first_name' => 'string',
             'middle_name' => 'string',
             'last_name' => 'string',
             'phone_number' => 'numeric',
-            'email' => 'email|unique:scholars',
-            'id_number' => 'max:12|unique:scholars',
+            // 'email' => 'email|unique:scholars', //error on validating own email of scholar
+            // 'id_number' => 'max:12|unique:scholars',
             'department' => 'string',
             'course' => 'string',
             'major' => 'string',

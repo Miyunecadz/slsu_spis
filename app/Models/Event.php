@@ -15,4 +15,9 @@ class Event extends Model
         'event_end',
         'details'
     ];
+
+    public function eventIndividual()
+    {
+        return $this->hasmany(EventIndividual::class);
+    }
 }

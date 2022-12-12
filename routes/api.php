@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\PasswordController;
 use App\Http\Controllers\ScholarController;
+use App\Http\Controllers\ScholarshipController;
 use App\Http\Controllers\SMSBlastController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -38,6 +39,7 @@ Route::prefix('auth')->group(function(){
 Route::middleware('auth')->group(function(){
     Route::prefix('scholars')->controller(ScholarController::class)->group(function(){
         Route::get('/', 'index');
+        Route::get('/recipient', 'recipient'); //added for event recipient list
         Route::get('/{id_number}', 'show');
         Route::post('/', 'store');
         Route::put('/{id_number}', 'update');
@@ -48,6 +50,13 @@ Route::middleware('auth')->group(function(){
         Route::get('/', 'index');
         Route::post('/', 'store');
         Route::get('/{id}', 'show');
+        Route::put('/{id}', 'update');
+    });
+
+    Route::prefix('scholarship')->controller(ScholarshipController::class)->group(function() {
+        Route::get('/', 'index');
+        Route::post('/', 'store');
+        Route::put('/{id}', 'update');
     });
 
     Route::post('/sms', SMSBlastController::class);
