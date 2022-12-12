@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\PasswordController;
 use App\Http\Controllers\ScholarController;
@@ -57,6 +58,11 @@ Route::middleware('auth')->group(function(){
         Route::get('/', 'index');
         Route::post('/', 'store');
         Route::put('/{id}', 'update');
+    });
+
+    Route::prefix('documents')->controller(DocumentController::class)->group(function () {
+        Route::get('/', 'index');
+        Route::post('/', 'upload');
     });
 
     Route::post('/sms', SMSBlastController::class);
