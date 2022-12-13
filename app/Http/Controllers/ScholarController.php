@@ -39,7 +39,7 @@ class ScholarController extends Controller
             ->when($request->scholarship != 0, function ($query) use ($request) {
                 $query->where('scholarship_id', "$request->scholarship");
             })
-            ->paginate(10);
+            ->get(); //remove pagination
 
 
 

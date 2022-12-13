@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ConcernController;
 use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\PasswordController;
@@ -32,6 +33,9 @@ Route::prefix('auth')->group(function(){
 
     Route::controller(PasswordController::class)->group(function(){
         Route::post('/password-request', 'changePasswordRequest');
+        
+        Route::post('/changePasswordAdmin', 'changePasswordAdmin')->middleware('auth');
+        Route::post('/changePasswordScholar', 'changePasswordScholar')->middleware('auth');
     });
 });
 
@@ -63,6 +67,15 @@ Route::middleware('auth')->group(function(){
     Route::prefix('documents')->controller(DocumentController::class)->group(function () {
         Route::get('/', 'index');
         Route::post('/', 'upload');
+    });
+
+    Route::prefix('concern')->controller(ConcernController::class)->group(function () {
+        Route::get('/', 'index');
+        Route::get('/search', 'search');
+        Route::get('/scholar/{scholar_id}', 'scholarConcern');
+        Route::post('/', 'store');
+        Route::post('/reply/{concern_id}', 'storeReply');
+        Route::delete('/', 'destroy');
     });
 
     Route::post('/sms', SMSBlastController::class);

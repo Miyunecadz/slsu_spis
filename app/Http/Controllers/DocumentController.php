@@ -15,7 +15,7 @@ class DocumentController extends Controller
     {
         $documentQuery = new Document;
         if($request->has('id_number')) {
-            $scholar = Scholar::where('id_number', $request->scholar)->first();
+            $scholar = Scholar::where('id_number', $request->id_number)->first();
             $documentQuery->where('scholar_id', $scholar->id);
         }
 
@@ -27,10 +27,10 @@ class DocumentController extends Controller
     }
     public function upload(Request $request)
     {
+      
         $validator = Validator::make($request->all(), [
-            'filename' => 'required',
-            'scholar' => 'required|exists:scholars,id_number',
-            'document' => 'required'
+            'scholar_id' => 'required|exists:scholars,id',
+            'file' => 'required'
         ]);
 
         if($validator->fails())
@@ -40,12 +40,12 @@ class DocumentController extends Controller
                 'errors' => $validator->errors()
             ]);
         }
-
-        $scholar = Scholar::where('id_number', $request->scholar)->first();
-        $path = Storage::putFileAs('public', $request->document, $request->filename . "." . $request->document->getClientOriginalExtension());
+        $temporaryFilename = "slsu-spis-".rand(0001, 9999);
+        $scholar = Scholar::find($request->scholar_id);
+        $path = Storage::putFileAs('public', $request->file, $scholar->first_name.' '.$scholar->id_number.'-'. $temporaryFilename . $request->filename . "." . $request->file->getClientOriginalExtension());
 
         $document = Document::create([
-            'filename' => $request->filename,
+            'filename' => $request->file,
             'scholar_id' => $scholar->id,
             'file_path' => $path
         ]);

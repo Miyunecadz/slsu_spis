@@ -23,4 +23,9 @@ class Scholar extends Model
         'scholarship_id',
         'email'
     ];
+
+    public function concerns()
+    {
+        return $this->hasMany(Concern::class);
+    }
 }
