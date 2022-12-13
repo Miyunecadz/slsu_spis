@@ -66,6 +66,9 @@ Route::middleware('auth')->group(function(){
 
     Route::prefix('documents')->controller(DocumentController::class)->group(function () {
         Route::get('/', 'index');
+        Route::get('/search', 'search'); //added search
+        Route::get('/download/{filename}', 'download'); //added search
+        Route::put('/{document_history}', 'update'); //added update
         Route::post('/', 'upload');
         Route::delete('/', 'delete');
     });

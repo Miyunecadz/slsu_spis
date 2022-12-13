@@ -19,5 +19,10 @@ class Document extends Model
     {
         return $this->hasMany(DocumentHistory::class);
     }
+
+    public function scholars()
+    {
+        return $this->belongsTo(Scholar::class, 'scholar_id');
+    }
 }
 

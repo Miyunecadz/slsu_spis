@@ -43,9 +43,9 @@ class ScholarController extends Controller
 
 
 
-        return response()->json([
+        return response()->json(
             $scholars
-        ]);
+        );
     }
 
 

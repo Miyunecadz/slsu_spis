@@ -50,7 +50,15 @@ class ConcernController extends Controller
             $query->where('scholarship_id', "$request->scholarship");
         })->pluck('id')->all();
 
-        $concerns = Concern::whereIn('scholar_id', $scholars)->with('scholars')->with('replies')->withCount('replies')->orderBy('created_at', 'desc')->get();
+        $concerns = Concern::whereIn('scholar_id', $scholars)
+                    ->with('scholars')
+                    ->with('replies')
+                    ->withCount('replies')
+                    ->orderBy('created_at', 'desc')
+                    ->when($request->has('limit'), function ($query) use ($request) {
+                        $query->limit($request->limit);
+                    })
+                    ->get();
 
         return response()->json($concerns);
     }

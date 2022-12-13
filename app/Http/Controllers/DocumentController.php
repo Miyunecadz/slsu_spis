@@ -15,7 +15,7 @@ class DocumentController extends Controller
     {
         $documentQuery = new Document;
         if ($request->has('id_number')) {
-            $scholar = Scholar::where('id_number', $request->id_number)->first(); //wrong request
+            $scholar = Scholar::where('id_number', $request->id_number)->first(); //wrong request. $request->scholar
             $documentQuery->where('scholar_id', $scholar->id);
         }
 
@@ -25,6 +25,60 @@ class DocumentController extends Controller
         ]);
 
     }
+
+    public function search(Request $request)
+    {
+        $scholars = Scholar::when($request->scholarName != '', function ($query) use ($request) {   //Added for search
+            $query->where('first_name', 'LIKE', "%$request->scholarName%")
+            ->orwhere('last_name', 'LIKE', "%$request->scholarName%");
+        })
+        ->when($request->scholarship != 0, function ($query) use ($request) {
+            $query->where('scholarship_id', "$request->scholarship");
+        })->pluck('id')->all();
+        
+        $documentQuery = Document::whereIn('scholar_id', $scholars)
+                        ->with('document_histories')
+                        ->with('scholars')
+                        ->orderBy('created_at', 'desc')
+                        ->when($request->has('limit'), function ($query) use ($request) {
+                            $query->limit($request->limit);
+                        })
+                        ->get();
+        
+        return response()->json([
+            'status' => true,
+            'documents' => $documentQuery
+        ]);
+
+    }
+
+    public function download(Request $request)
+    {       
+        $documentQuery = Document::where('file_path',$request->filename)->first();
+
+        $file = Storage::disk('public')->get($documentQuery->filename);
+  
+        return response($file, 200);
+    }
+
+    public function update(Request $request)
+    {       
+        $documentQuery = DocumentHistory::find($request->document_history);
+        $updateResult = $documentQuery->update($request->all());
+
+        if(!$updateResult) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Unable to update scholar document'
+            ]);
+        }
+        return response()->json([
+            'status' => true,
+            'documents' => $documentQuery
+        ]);
+
+    }
+
     public function upload(Request $request)
     {
       
@@ -40,20 +94,20 @@ class DocumentController extends Controller
             ]);
         }
 
-        $fileName = $request->filename . "." . $request->document->getClientOriginalExtension();
+        $fileName = $request->filename . "." . $request->file->getClientOriginalExtension();
 
         $index = 1;
         while (Storage::exists('public/' . $fileName)) {
-            $fileName = $request->filename . "_$index.".$request->document->getClientOriginalExtension();
+            $fileName = $request->filename . "_$index.".$request->file->getClientOriginalExtension();
             $index++;
         }
 
-        $scholar = Scholar::where('id_number', $request->scholar)->first();
-        $path = Storage::putFileAs('public', $request->document, $fileName);
+        $scholar = Scholar::where('id_number', $request->scholar_id)->first();
+        $path = Storage::putFileAs('public', $request->file, $fileName);
 
         $document = Document::create([
             'filename' => $fileName,
-            'scholar_id' => $scholar->id,
+            'scholar_id' => $request->scholar_id,
             'file_path' => $path
         ]);
 
@@ -71,7 +125,7 @@ class DocumentController extends Controller
     public function delete(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'filename' => 'required|string'
+            'document_id' => 'required'
         ]);
 
         if ($validator->fails()) {
@@ -81,7 +135,7 @@ class DocumentController extends Controller
             ]);
         }
 
-        $document = Document::where('filename', $request->filename)->first();
+        $document = Document::find($request->document_id);
 
         if(!$document) {
             return response()->json([

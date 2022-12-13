@@ -28,4 +28,9 @@ class Scholar extends Model
     {
         return $this->hasMany(Concern::class);
     }
+
+    public function documents()
+    {
+        return $this->hasMany(Document::class);
+    }
 }
