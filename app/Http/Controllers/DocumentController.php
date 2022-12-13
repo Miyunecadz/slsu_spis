@@ -15,7 +15,7 @@ class DocumentController extends Controller
     {
         $documentQuery = new Document;
         if ($request->has('id_number')) {
-            $scholar = Scholar::where('id_number', $request->scholar)->first();
+            $scholar = Scholar::where('id_number', $request->id_number)->first(); //wrong request
             $documentQuery->where('scholar_id', $scholar->id);
         }
 
