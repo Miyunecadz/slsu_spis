@@ -81,7 +81,7 @@ class DocumentController extends Controller
 
     public function upload(Request $request)
     {
-      
+
         $validator = Validator::make($request->all(), [
             'scholar_id' => 'required|exists:scholars,id',
             'file' => 'required'
@@ -94,15 +94,15 @@ class DocumentController extends Controller
             ]);
         }
 
-        $fileName = $request->filename . "." . $request->file->getClientOriginalExtension();
+        $fileName = $request->file->getClientOriginalName();
 
         $index = 1;
-        while (Storage::exists('public/' . $fileName)) {
-            $fileName = $request->filename . "_$index.".$request->file->getClientOriginalExtension();
+        while (Storage::exists($request->path . '/' . $fileName)) {
+            $separatedName = explode(".", $fileName);
+            $fileName = $separatedName[0] . " ($index)." . $separatedName[1];
             $index++;
         }
 
-        $scholar = Scholar::where('id_number', $request->scholar_id)->first();
         $path = Storage::putFileAs('public', $request->file, $fileName);
 
         $document = Document::create([
@@ -137,14 +137,14 @@ class DocumentController extends Controller
 
         $document = Document::find($request->document_id);
 
-        if(!$document) {
+        if (!$document) {
             return response()->json([
                 'status' => false,
                 'message' => 'Unable to execute, Document not found!'
             ]);
         }
 
-        Storage::delete('public/'.$document->filename);
+        Storage::delete('public/' . $document->filename);
         $document->delete();
         DocumentHistory::where('document_id', $document->id)->delete();
 
