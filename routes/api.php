@@ -67,6 +67,7 @@ Route::middleware('auth')->group(function(){
     Route::prefix('documents')->controller(DocumentController::class)->group(function () {
         Route::get('/', 'index');
         Route::post('/', 'upload');
+        Route::delete('/', 'delete');
     });
 
     Route::prefix('concern')->controller(ConcernController::class)->group(function () {

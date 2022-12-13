@@ -14,8 +14,8 @@ class DocumentController extends Controller
     public function index(Request $request)
     {
         $documentQuery = new Document;
-        if($request->has('id_number')) {
-            $scholar = Scholar::where('id_number', $request->id_number)->first();
+        if ($request->has('id_number')) {
+            $scholar = Scholar::where('id_number', $request->scholar)->first();
             $documentQuery->where('scholar_id', $scholar->id);
         }
 
@@ -33,19 +33,26 @@ class DocumentController extends Controller
             'file' => 'required'
         ]);
 
-        if($validator->fails())
-        {
+        if ($validator->fails()) {
             return response()->json([
                 'status' => false,
                 'errors' => $validator->errors()
             ]);
         }
-        $temporaryFilename = "slsu-spis-".rand(0001, 9999);
-        $scholar = Scholar::find($request->scholar_id);
-        $path = Storage::putFileAs('public', $request->file, $scholar->first_name.' '.$scholar->id_number.'-'. $temporaryFilename . $request->filename . "." . $request->file->getClientOriginalExtension());
+
+        $fileName = $request->filename . "." . $request->document->getClientOriginalExtension();
+
+        $index = 1;
+        while (Storage::exists('public/' . $fileName)) {
+            $fileName = $request->filename . "_$index.".$request->document->getClientOriginalExtension();
+            $index++;
+        }
+
+        $scholar = Scholar::where('id_number', $request->scholar)->first();
+        $path = Storage::putFileAs('public', $request->document, $fileName);
 
         $document = Document::create([
-            'filename' => $request->file,
+            'filename' => $fileName,
             'scholar_id' => $scholar->id,
             'file_path' => $path
         ]);
@@ -60,4 +67,37 @@ class DocumentController extends Controller
             'message' => 'Document has been successfully uploaded'
         ]);
     }
+
+    public function delete(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'filename' => 'required|string'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => false,
+                'errors' => $validator->errors()
+            ]);
+        }
+
+        $document = Document::where('filename', $request->filename)->first();
+
+        if(!$document) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Unable to execute, Document not found!'
+            ]);
+        }
+
+        Storage::delete('public/'.$document->filename);
+        $document->delete();
+        DocumentHistory::where('document_id', $document->id)->delete();
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Document has been successfully removed!'
+        ]);
+    }
+
 }
