@@ -91,7 +91,7 @@ class ScholarController extends Controller
             ]);
         }
 
-        $scholarship = Scholarship::select('id')->where('scholarship_name', 'like', "$request->scholarship%")->first();
+        $scholarship = Scholarship::select('id')->find($request->scholarship);
 
         $scholar = Scholar::create([
             'first_name' => $request->input('first_name'),

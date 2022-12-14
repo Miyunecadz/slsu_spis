@@ -22,7 +22,8 @@ class DocumentController extends Controller
 
         return response()->json([
             'status' => true,
-            'documents' => $documentQuery->with('document_histories')->get()
+            'documents' => $documentQuery->with('document_histories')
+            ->orderBy('created_at', 'desc')->get()
         ]);
 
     }

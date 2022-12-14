@@ -22,14 +22,6 @@ class EventController extends Controller
             })
         ]);
 
-        // $validator = Validator::make($request->all(), [
-        //     'title' => 'string',
-        //     'event_start' => 'date',
-        //     'event_end' => 'date',
-        //     'details' => 'string',
-        //     'id_number' => Rule::exists('scholars', 'id_number')
-        // ]);
-
         if($validator->fails())
         {
             return response()->json([
@@ -37,15 +29,6 @@ class EventController extends Controller
                 'error' => $validator->errors()
             ]);
         }
-        
-        // $events = Event::join('event_individuals', 'event_individuals.scholar_id')
-        // // ->whereDate('event_start', '>=', Carbon::yesterday()->toDateString())
-        //     ->when($request->has('id'), function ($query) use ($request) {
-        //         $query->join('event_individuals', 'event_individuals.event_id', 'events.id')
-        //             ->join('scholars', 'event_individuals.scholar_id', 'scholars.id')
-        //             ->where('id_number', $request->id_number);
-        //     })
-        //     ->get();
         if($request->has('id'))
         {
             $events = EventIndividual::where('scholar_id', $request->id)->with('event')->get();
@@ -53,28 +36,6 @@ class EventController extends Controller
         {
             $events = Event::with('eventIndividual')->get();
         }
-        
-       
-        // $events = Event::
-        //     when($request->has('title'), function ($query) use ($request) {
-        //         $query->where('title', 'LIKE', "%$request->title%");
-        //     })
-        //     ->when($request->has('event_start'), function ($query) use ($request) {
-        //         $query->where('event_start', $request->event_start);
-        //     })
-        //     ->when($request->has('event_end'), function ($query) use ($request) {
-        //         $query->where('event_end', $request->event_end);
-        //     })
-        //     ->when($request->has('details'), function ($query) use ($request) {
-        //         $query->where('details', $request->details);
-        //     })
-        //     ->when($request->has('id_number'), function ($query) use ($request) {
-        //         $query->join('event_individuals', 'event_individuals.event_id', 'events.id')
-        //             ->join('scholars', 'event_individuals.scholar_id', 'scholars.id')
-        //             ->where('id_number', $request->id_number);
-        //     })
-        //     ->paginate(10);
-
         return response()->json($events); 
     }
 
