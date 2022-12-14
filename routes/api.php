@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ConcernController;
 use App\Http\Controllers\DocumentController;
@@ -8,8 +9,6 @@ use App\Http\Controllers\PasswordController;
 use App\Http\Controllers\ScholarController;
 use App\Http\Controllers\ScholarshipController;
 use App\Http\Controllers\SMSBlastController;
-use App\Models\Document;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -61,6 +60,7 @@ Route::middleware('auth')->group(function(){
 
     Route::prefix('scholarship')->controller(ScholarshipController::class)->group(function() {
         Route::get('/', 'index');
+        Route::get('/counts', 'scholarCounts');
         Route::post('/', 'store');
         Route::put('/{id}', 'update');
     });
@@ -80,6 +80,10 @@ Route::middleware('auth')->group(function(){
         Route::post('/', 'store');
         Route::post('/reply/{concern_id}', 'storeReply');
         Route::delete('/', 'destroy');
+    });
+
+    Route::prefix('admin')->controller(AdminController::class)->group(function () {
+        Route::put('/', 'update');
     });
 
     Route::get('/download', [DocumentController:: class, 'download']); //added download

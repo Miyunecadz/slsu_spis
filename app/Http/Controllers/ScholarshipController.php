@@ -18,6 +18,19 @@ class ScholarshipController extends Controller
         );
     }
 
+    public function scholarCounts(Request $request)
+    {
+        $scholarship = Scholarship::withCount('scholars')
+        ->when($request->has('limit'), function ($query) use ($request) {
+            $query->limit($request->limit);
+        })
+        ->get();
+
+        return response()->json(
+            $scholarship
+        );
+    }
+
 
     public function store(Request $request)
     {

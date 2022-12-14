@@ -129,7 +129,11 @@ class EventController extends Controller
             ]);
         }
 
-        $event = Event::find($params['id']);
+        if ($request->has('id_number')){
+            $event = Event::where('id_number', $request->id_number)->get();
+        }else{
+            $event = Event::find($params['id']);
+        }
 
         return response()->json([
             'status' => true,

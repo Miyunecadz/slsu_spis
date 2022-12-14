@@ -14,4 +14,9 @@ class Scholarship extends Model
         'scholarship_name',
         'scholarship_detail',
     ];
+
+    public function scholars()
+    {
+        return $this->hasMany(Scholar::class);
+    }
 }

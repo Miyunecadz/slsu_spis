@@ -35,6 +35,8 @@ class DocumentController extends Controller
         })
         ->when($request->scholarship != 0, function ($query) use ($request) {
             $query->where('scholarship_id', "$request->scholarship");
+        })->when($request->scholarId_number != 0, function ($query) use ($request) {
+            $query->where('id_number', "$request->scholarId_number");
         })->pluck('id')->all();
         
         $documentQuery = Document::whereIn('scholar_id', $scholars)
