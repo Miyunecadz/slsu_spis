@@ -8,6 +8,7 @@ use App\Http\Controllers\PasswordController;
 use App\Http\Controllers\ScholarController;
 use App\Http\Controllers\ScholarshipController;
 use App\Http\Controllers\SMSBlastController;
+use App\Models\Document;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -67,7 +68,6 @@ Route::middleware('auth')->group(function(){
     Route::prefix('documents')->controller(DocumentController::class)->group(function () {
         Route::get('/', 'index');
         Route::get('/search', 'search'); //added search
-        Route::get('/download/{filename}', 'download'); //added search
         Route::put('/{document_history}', 'update'); //added update
         Route::post('/', 'upload');
         Route::delete('/', 'delete');
@@ -82,6 +82,7 @@ Route::middleware('auth')->group(function(){
         Route::delete('/', 'destroy');
     });
 
+    Route::get('/download', [DocumentController:: class, 'download']); //added download
     Route::post('/sms', SMSBlastController::class);
 });
 

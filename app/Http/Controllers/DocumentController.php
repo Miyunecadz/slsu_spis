@@ -6,6 +6,7 @@ use App\Models\Document;
 use App\Models\DocumentHistory;
 use App\Models\Scholar;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
@@ -53,12 +54,26 @@ class DocumentController extends Controller
     }
 
     public function download(Request $request)
-    {       
-        $documentQuery = Document::where('file_path',$request->filename)->first();
+    {     
+        $documentQuery = Document::where('filename',$request->filename)->first();
 
-        $file = Storage::disk('public')->get($documentQuery->filename);
+        $file_path = $documentQuery->file_path;
+
+        if (substr($file_path, 0, strlen('public/')) == 'public/') {
+            $file_path = substr($file_path, strlen('public/'));
+        } 
+
+        $file = Storage::disk('public')->get($file_path);
+        // $file = public_path($file_path);
+
+        return response($file);
+
+        $headers = [
+            'Content-Type' => 'application/pdf',
+         ];
   
-        return response($file, 200);
+        //  return response()->download($file, $request->filename ,$headers);
+         return (new Response($file, 200));
     }
 
     public function update(Request $request)
