@@ -17,7 +17,7 @@ class DocumentController extends Controller
         $documentQuery = new Document;
         if ($request->has('id_number')) {
             $scholar = Scholar::where('id_number', $request->id_number)->first(); //wrong request. $request->scholar
-            $documentQuery->where('scholar_id', $scholar->id);
+            $documentQuery = Document::where('scholar_id', $scholar->id); // bug here
         }
 
         return response()->json([
@@ -30,14 +30,14 @@ class DocumentController extends Controller
 
     public function search(Request $request)
     {
-        $scholars = Scholar::when($request->scholarName != '', function ($query) use ($request) {   //Added for search
+        $scholars = Scholar::when($request->has('scholarName'), function ($query) use ($request) {   //Added for search
             $query->where('first_name', 'LIKE', "%$request->scholarName%")
             ->orwhere('last_name', 'LIKE', "%$request->scholarName%");
         })
-        ->when($request->scholarship != 0, function ($query) use ($request) {
+        ->when($request->has('scholarship'), function ($query) use ($request) {
             $query->where('scholarship_id', "$request->scholarship");
-        })->when($request->scholarId_number != 0, function ($query) use ($request) {
-            $query->where('id_number', "$request->scholarId_number");
+        })->when($request->has('scholarId_number'), function ($query) use ($request) {
+            $query->where('id_number', $request->scholarId_number);
         })->pluck('id')->all();
         
         $documentQuery = Document::whereIn('scholar_id', $scholars)

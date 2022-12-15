@@ -29,7 +29,7 @@ class SMSBlastController extends Controller
         {
             $scholar = Scholar::find($recipient);
             $message = "Sender Name: ". $request->sender_name ."\nContent: ". $request->sms_detail;
-            // SMSHelper::send($scholar->phone_number, $message);
+            SMSHelper::send($scholar->phone_number, $message);
         }
 
         return response()->json([
