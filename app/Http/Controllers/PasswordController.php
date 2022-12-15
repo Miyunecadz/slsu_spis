@@ -42,7 +42,7 @@ class PasswordController extends Controller
         ]);
     }
 
-    
+
     public function changePasswordScholar(Request $request)
     {
         // Validate incoming request
@@ -74,15 +74,15 @@ class PasswordController extends Controller
 
         //Check if who changed the password is scholar
         if($request->account_type == 2){
-    
+
             $account = User::where('user_id', $scholar->id)->where('account_type', 2)->first();
-    
+
             if(!$account->password_modified != now()->format('Y-m-d'))
             {
                 return response()->json([
                     'status' => false,
                     'errors' => ['Error' => 'You changed your password recently, Unable to change password']
-                    
+
                 ]);
             }
         }
@@ -139,7 +139,7 @@ class PasswordController extends Controller
 
         $account = User::where('user_id', $scholar->id)->where('account_type', 2)->first();
 
-        if(!$account->password_modified != now()->format('Y-m-d'))
+        if($account->password_modified != now()->format('Y-m-d'))
         {
             return response()->json([
                 'status' => false,
