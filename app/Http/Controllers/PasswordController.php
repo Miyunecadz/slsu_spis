@@ -139,7 +139,7 @@ class PasswordController extends Controller
 
         $account = User::where('user_id', $scholar->id)->where('account_type', 2)->first();
 
-        if($account->password_modified != now()->format('Y-m-d'))
+        if($account->password_modified != now()->format('Y-m-d') && $account->password_modified != null)
         {
             return response()->json([
                 'status' => false,
