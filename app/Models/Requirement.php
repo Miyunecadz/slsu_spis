@@ -5,17 +5,17 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class DocumentHistory extends Model
+class Requirement extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'document_id',
-        'status'
+        'scholarship_id',
+        'requirement'
     ];
 
-    public function documents()
+    public function scholarships()
     {
-        return $this->belongsTo(Document::class, 'document_id');
+        return $this->belongsTo(Scholarship::class, 'scholarship_id');
     }
 }

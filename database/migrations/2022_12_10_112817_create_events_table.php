@@ -19,6 +19,7 @@ class CreateEventsTable extends Migration
             $table->date('event_start');
             $table->date('event_end');
             $table->text('details');
+            $table->text('academic_year');
             $table->timestamps();
         });
     }

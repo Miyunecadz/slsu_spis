@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Concern;
 use App\Models\ConcernReply;
 use App\Models\Scholar;
+use App\Models\ScholarHistory;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
@@ -34,8 +36,9 @@ class ConcernController extends Controller
                 'error' => $validator->errors()
             ]);
         }
+        $scholar_history = ScholarHistory::where('scholar_id', $request->scholar_id)->latest()->first();
 
-        $concerns = Concern::where('scholar_id', $request->scholar_id)->with('replies')->withCount('replies')->orderBy('created_at', 'desc')->get();
+        $concerns = Concern::where('scholar_history_id', $scholar_history->id)->with('replies')->withCount('replies')->orderBy('created_at', 'desc')->get();
 
         return response()->json($concerns);
     }
@@ -50,9 +53,22 @@ class ConcernController extends Controller
             $query->where('scholarship_id', "$request->scholarship");
         })->pluck('id')->all();
 
-        $concerns = Concern::whereIn('scholar_id', $scholars)
-                    ->with('scholars')
-                    ->with('replies')
+        $scholar_history = ScholarHistory::when($request->has('semester') && $request->semester != 0, function ($query) use ($request, $scholars) {
+            $query->where('semester', $request->semester)->whereIn('scholar_id', $scholars);
+        })
+        ->when($request->academicYear != 0, function ($query) use ($request, $scholars) {
+            $query->where('academic_year', $request->academicYear)->whereIn('scholar_id', $scholars);
+        })
+        ->pluck('id')->all();
+
+        
+
+        $concerns = Concern::whereIn('scholar_history_id', $scholar_history)
+                    // ->with('scholars')
+                    // ->with('replies')
+                    ->with(['scholarHistories' => function($query) {
+                        return $query->with('scholars');
+                    }])
                     ->withCount('replies')
                     ->orderBy('created_at', 'desc')
                     ->when($request->has('limit'), function ($query) use ($request) {
@@ -80,7 +96,13 @@ class ConcernController extends Controller
             ]);
         }
 
-        Concern::create($request->all());
+        $scholar_history = ScholarHistory::where('scholar_id', $request->scholar_id)->latest()->first();
+
+
+        Concern::create([
+            'scholar_history_id' => $scholar_history->id,
+            'details' => $request->details
+        ]);
 
         return response()->json([
             'status' => true,

@@ -11,7 +11,9 @@ class Document extends Model
 
     protected $fillable = [
         'filename',
-        'scholar_id',
+        'scholar_history_id',
+        'document_for',
+        'academic_year',
         'file_path'
     ];
 
@@ -20,9 +22,14 @@ class Document extends Model
         return $this->hasMany(DocumentHistory::class);
     }
 
+    public function scholarHistories()
+    {
+        return $this->belongsTo(ScholarHistory::class, 'scholar_history_id', 'id');
+    }
+
     public function scholars()
     {
-        return $this->belongsTo(Scholar::class, 'scholar_id');
+        return $this->hasOneThrough(Scholar::class, ScholarHistory::class, 'scholar_id', 'id');
     }
 }
 

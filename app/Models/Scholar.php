@@ -21,7 +21,8 @@ class Scholar extends Model
         'major',
         'year_level',
         'scholarship_id',
-        'email'
+        'email',
+        'qualified'
     ];
 
     public function concerns()
@@ -32,5 +33,15 @@ class Scholar extends Model
     public function documents()
     {
         return $this->hasMany(Document::class);
+    }
+
+    public function scholarships()
+    {
+        return $this->belongsTo(Scholarship::class,'scholarship_id','id');
+    }
+
+    public function scholarHistories()
+    {
+        return $this->hasMany(ScholarHistory::class, 'scholar_id', 'id');
     }
 }

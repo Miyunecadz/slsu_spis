@@ -13,7 +13,8 @@ class Event extends Model
         'title',
         'event_start',
         'event_end',
-        'details'
+        'details',
+        'academic_year'
     ];
 
     public function eventIndividual()

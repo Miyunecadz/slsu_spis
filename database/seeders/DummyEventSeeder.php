@@ -2,9 +2,11 @@
 
 namespace Database\Seeders;
 
+use App\Models\AcademicYear;
 use App\Models\Event;
 use App\Models\EventIndividual;
 use App\Models\Scholar;
+use App\Models\ScholarHistory;
 use Illuminate\Database\Seeder;
 
 class DummyEventSeeder extends Seeder
@@ -21,12 +23,12 @@ class DummyEventSeeder extends Seeder
         Event::factory()->count(1)->create();
 
         $event = Event::inRandomOrder()->limit(1)->first();
-        $scholars = Scholar::inRandomOrder()->limit(1)->get();
+        $scholars = ScholarHistory::inRandomOrder()->limit(1)->get();
         foreach($scholars as $scholar)
         {
             EventIndividual::create([
                 'event_id' => $event->id,
-                'scholar_id' => $scholar->id
+                'scholar_history_id' => $scholar->id
             ]);
         }
     }

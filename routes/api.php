@@ -1,14 +1,17 @@
 <?php
 
+use App\Http\Controllers\AcademicYearController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ConcernController;
 use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\PasswordController;
+use App\Http\Controllers\RequirementController;
 use App\Http\Controllers\ScholarController;
 use App\Http\Controllers\ScholarshipController;
 use App\Http\Controllers\SMSBlastController;
+use App\Models\AcademicYear;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -45,7 +48,9 @@ Route::middleware('auth')->group(function(){
     Route::prefix('scholars')->controller(ScholarController::class)->group(function(){
         Route::get('/', 'index');
         Route::get('/recipient', 'recipient'); //added for event recipient list
+        Route::get('/academic-year', 'getAcademicYears');
         Route::get('/{id_number}', 'show');
+        Route::post('/qualify', 'qualifyScholar');
         Route::post('/', 'store');
         Route::put('/{id_number}', 'update');
         Route::delete('/{id_number}', 'destroy');
@@ -69,6 +74,8 @@ Route::middleware('auth')->group(function(){
     Route::prefix('documents')->controller(DocumentController::class)->group(function () {
         Route::get('/', 'index');
         Route::get('/search', 'search'); //added search
+        Route::get('/check/{id}', 'checkScholarQualification');
+        Route::get('/checklist/{id_number}', 'getCheckList');
         Route::put('/{document_history}', 'update'); //added update
         Route::post('/', 'upload');
         Route::delete('/', 'delete');
@@ -83,8 +90,23 @@ Route::middleware('auth')->group(function(){
         Route::delete('/', 'destroy');
     });
 
+    Route::prefix('requirements')->controller(RequirementController::class)->group(function() {
+        Route::get('/', 'index');
+        Route::get('/{id}', 'show');
+        Route::post('/', 'store');
+        Route::put('/{id}', 'update');
+        Route::delete('/{id}', 'delete');
+    });
+
     Route::prefix('admin')->controller(AdminController::class)->group(function () {
         Route::put('/', 'update');
+    });
+
+    Route::prefix('academic')->controller(AcademicYearController::class)->group(function() {
+        Route::get('/', 'index');
+        Route::get('/active-year', 'show');
+        Route::post('/', 'store');
+        Route::put('/{id}', 'update');
     });
 
     Route::get('/download', [DocumentController:: class, 'download']); //added download

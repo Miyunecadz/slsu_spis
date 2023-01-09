@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\SMSHelper;
+use App\Models\AcademicYear;
 use App\Models\Event;
 use App\Models\EventIndividual;
 use App\Models\Scholar;
+use App\Models\ScholarHistory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
@@ -19,7 +21,8 @@ class EventController extends Controller
         $validator = Validator::make($request->all(), [
             'id' => Rule::exists('scholars')->where(function ($query) use ($request) {
                 return $query->find($request->id);
-            })
+            }),
+            'academic_year' => 'required'
         ]);
 
         if($validator->fails())
@@ -31,8 +34,27 @@ class EventController extends Controller
         }
         if($request->has('id'))
         {
-            $events = EventIndividual::where('scholar_id', $request->id)->with('event')->get();
-        }else
+            $scholar_history_id = ScholarHistory::where('scholar_id', $request->id)
+            ->where('academic_year', $request->academic_year)
+            ->when($request->semester != 0, function ($query) use ($request) {
+                $query->where('semester', $request->semester);
+            })->latest()
+            ->first();
+            $event_individual = EventIndividual::where('scholar_history_id', $scholar_history_id->id)->pluck('event_id')->all();
+            $events = Event::whereIn('id', $event_individual)->get();
+        }
+        else if($request->has('id_number')){
+            $scholar = Scholar::where('id_number', $request->id_number)->first();
+            $scholar_history_id = ScholarHistory::where('scholar_id', $scholar->id)
+            ->where('academic_year', $request->academic_year)
+            ->when($request->semester != 0, function ($query) use ($request) {
+                $query->where('semester', $request->semester);
+            })->latest()
+            ->first();
+            $event_individual = EventIndividual::where('scholar_history_id', $scholar_history_id->id)->pluck('event_id')->all();
+            $events = Event::whereIn('id', $event_individual)->get();
+        }
+        else
         {
             $events = Event::with('eventIndividual')->get();
         }
@@ -46,7 +68,8 @@ class EventController extends Controller
             'event_start' => 'required|date',
             'event_end' => 'required|date',
             'details' => 'required',
-            'recipients' => 'required|array'
+            'recipients' => 'required|array',
+            'academic_year' => 'required'
         ]);
 
         if($validator->fails())
@@ -58,15 +81,22 @@ class EventController extends Controller
         }
         $event = Event::create(Arr::except($request->all(), ['recipients']));
 
+       
         foreach($request->recipients as $recipient)
         {
-            EventIndividual::create([
-                'event_id' => $event->id,
-                'scholar_id' => $recipient
-            ]);
-
-            $scholar = Scholar::find($recipient);
-            SMSHelper::send($scholar->phone_number, 'New Event has been posted! For more information check the event details.');
+            if($recipient != 0){
+                $scholar_history_id = ScholarHistory::where('scholar_id', $recipient)
+                ->where('academic_year', $request->academic_year)
+                ->latest()->first();
+                EventIndividual::create([
+                    'event_id' => $event->id,
+                    'scholar_history_id' => $scholar_history_id->id,
+                    'scholar_id' => $recipient
+                ]);
+    
+                $scholar = Scholar::find($recipient);
+                SMSHelper::send($scholar->phone_number, 'New Event has been posted! ' . $request->details);
+            }
         }
 
         return response()->json([
@@ -128,13 +158,20 @@ class EventController extends Controller
 
         foreach($request->recipients as $recipient)
         {
-            EventIndividual::create([
-                'event_id' => $request->id,
-                'scholar_id' => $recipient
-            ]);
-
-            $scholar = Scholar::find($recipient);
-            SMSHelper::send($scholar->phone_number, 'New Event has been posted! For more information check the event details.');
+            if($recipient != 0){
+                $scholar_history_id = ScholarHistory::where('scholar_id', $recipient)
+                ->where('academic_year', $request->academic_year)
+                ->latest()->first();
+            
+                EventIndividual::create([
+                    'event_id' => $request->id,
+                    'scholar_history_id' => $scholar_history_id->id,
+                    'scholar_id' => $recipient
+                ]);
+    
+                $scholar = Scholar::find($recipient);
+                SMSHelper::send($scholar->phone_number, 'New Event has been posted! ' . $request->details);
+            }
         }
 
         return response()->json([

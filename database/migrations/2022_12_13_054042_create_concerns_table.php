@@ -15,7 +15,7 @@ class CreateConcernsTable extends Migration
     {
         Schema::create('concerns', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('scholar_id');
+            $table->unsignedBigInteger('scholar_history_id');
             $table->text('details');
             $table->timestamps();
         });

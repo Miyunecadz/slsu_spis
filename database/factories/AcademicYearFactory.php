@@ -4,7 +4,7 @@ namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-class EventFactory extends Factory
+class AcademicYearFactory extends Factory
 {
     /**
      * Define the model's default state.
@@ -14,11 +14,8 @@ class EventFactory extends Factory
     public function definition()
     {
         return [
-            'title' => $this->faker->jobTitle(),
-            'event_start' => now()->format('Y-m-d'),
-            'event_end' => now()->addMonth()->format('Y-m-d'),
             'academic_year' => '2022-2023',
-            'details' => $this->faker->realText()
+            'active' => true
         ];
     }
 }

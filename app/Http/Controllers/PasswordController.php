@@ -85,6 +85,8 @@ class PasswordController extends Controller
 
                 ]);
             }
+        }else{
+            $account = User::where('user_id', $scholar->id)->where('account_type', 2)->first();
         }
 
         $account->password = bcrypt($request->password);
