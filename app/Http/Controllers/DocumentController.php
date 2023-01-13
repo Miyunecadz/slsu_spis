@@ -272,15 +272,14 @@ class DocumentController extends Controller
         }
        
         foreach($requirements as $requirement){
-            $document = Document::
-            // where([['scholar_history_id', $scholar_history->id], ['academic_year', $request->academic_year], ['document_for', $requirement->requirement]])
-            where('scholar_history_id', $scholar_history->id)
-            ->where('document_for', '=', $requirement->requirement)
-            ->get();
+            $document = Document::where('scholar_history_id', $scholar_history->id)
+            ->where('document_for', $requirement->requirement)
+            ->first();
             
             try{
+                // return response()->json($document);
                 $documentHistory = DocumentHistory::where('document_id', $document->id)->first();
-                       
+                
                 $checkList[$requirement->requirement] =  $documentHistory->status;
     
                 if($documentHistory->status != 'approved'){
@@ -288,6 +287,7 @@ class DocumentController extends Controller
                 }
 
             }catch(Exception $ex){
+
                 $checkList[$requirement->requirement] =  'No Document';
                 $isQualified = false;
             }
@@ -295,8 +295,28 @@ class DocumentController extends Controller
         }
 
         if(!(Arr::exists($checkList, 'Grade') || Arr::exists($checkList, 'Grades'))){
-            $checkList['Grades'] = 'No Document';
-            $isQualified = false;
+            // $checkList['Grades'] = 'No Document';
+            // $isQualified = false;
+
+            $document = Document::where('scholar_history_id', $scholar_history->id)
+            ->where('document_for', 'Grades')
+            ->first();
+            
+            try{
+                // return response()->json($document);
+                $documentHistory = DocumentHistory::where('document_id', $document->id)->first();
+                
+                $checkList['Grades'] =  $documentHistory->status;
+    
+                if($documentHistory->status != 'approved'){
+                    $isQualified = false;
+                }
+
+            }catch(Exception $ex){
+
+                $checkList['Grades'] =  'No Document';
+                $isQualified = false;
+            }
         }
 
 
