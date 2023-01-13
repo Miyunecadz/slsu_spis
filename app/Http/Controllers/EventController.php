@@ -84,7 +84,7 @@ class EventController extends Controller
        
         foreach($request->recipients as $recipient)
         {
-            if($recipient != 0){
+            if($recipient > 0){
                 $scholar_history_id = ScholarHistory::where('scholar_id', $recipient)
                 ->where('academic_year', $request->academic_year)
                 ->latest()->first();
@@ -159,7 +159,7 @@ class EventController extends Controller
 
         foreach($request->recipients as $recipient)
         {
-            if($recipient != 0){
+            if($recipient > 0){
                 $scholar_history_id = ScholarHistory::where('scholar_id', $recipient)
                 ->where('academic_year', $request->academic_year)
                 ->latest()->first();

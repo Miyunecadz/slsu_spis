@@ -71,9 +71,14 @@ class ScholarController extends Controller
         ->whereIn('scholars.id', $scholar_history)
         ->get();
 
-        return response()->json(
-            $scholars
-        );
+        $scholarship_id = Scholar::whereIn('id', $scholar_history)->distinct()->pluck('scholarship_id')->all();
+
+        $scholarship = Scholarship::whereIn('id', $scholarship_id)->get();
+
+        return response()->json([
+            'scholars' => $scholars,
+            'scholarship' => $scholarship
+        ]);
     }
 
 

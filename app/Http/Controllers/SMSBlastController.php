@@ -27,7 +27,7 @@ class SMSBlastController extends Controller
 
         foreach($request->recipients as $recipient)
         {
-            if($recipient != 0){
+            if($recipient > 0){
                 $scholar = Scholar::find($recipient);
                 $message = "Sender Name: ". $request->sender_name ."\nContent: ". $request->sms_detail;
                 SMSHelper::send($scholar->phone_number, $message);

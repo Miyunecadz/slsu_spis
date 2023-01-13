@@ -11,7 +11,8 @@ class DocumentHistory extends Model
 
     protected $fillable = [
         'document_id',
-        'status'
+        'status',
+        'details'
     ];
 
     public function documents()

@@ -17,6 +17,7 @@ class CreateDocumentHistoriesTable extends Migration
             $table->id();
             $table->unsignedBigInteger('document_id');
             $table->string('status');
+            $table->string('details')->nullable();
             $table->timestamps();
         });
     }
