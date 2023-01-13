@@ -62,11 +62,13 @@ class ScholarController extends Controller
     }
 
 
-    public function recipient()
+    public function recipient(Request $request)
     {
+        $scholar_history = ScholarHistory::where('academic_year', $request->academic_year)->pluck('scholar_id')->all();
         $scholars = Scholar::join('scholarships', 'scholarships.id', '=', 'scholars.scholarship_id')
         ->select(DB::raw("CONCAT(scholars.id_number,' | ' ,scholars.first_name, ' ' ,scholars.last_name) AS display_name"), 'scholars.id', 'scholarships.scholarship_name')
-        ->where('id_number', 'NOT LIKE', '%-old%')
+        // ->where('id_number', 'NOT LIKE', '%-old%')
+        ->whereIn('scholars.id', $scholar_history)
         ->get();
 
         return response()->json(
@@ -191,7 +193,6 @@ class ScholarController extends Controller
             // 'id_number' => 'max:12|unique:scholars',
             'department' => 'string',
             'course' => 'string',
-            'major' => 'string',
             'year_level' => 'string',
             'scholarship' => 'string',
         ]);
@@ -345,6 +346,49 @@ class ScholarController extends Controller
         return response()->json([
             'status' => true,
             'academicYears' => $academicYears
+        ]);
+    }
+
+    public function getTotalScholarsSemester()
+    {
+        $scholar_history_1st_semester = ScholarHistory::selectRaw('academic_year, count(*) as total1stSemester')->where('semester', '1st Semester')->orderBy('academic_year', 'asc')->groupBy('academic_year')->get();
+        $scholar_history_2nd_semester = ScholarHistory::selectRaw('academic_year, count(*) as total2ndSemester')->where('semester', '2nd Semester')->orderBy('academic_year', 'asc')->groupBy('academic_year')->get();
+        $academic_year = AcademicYear::orderBy('academic_year', 'asc')->get();
+
+        return response()->json([
+            'status' => true,
+            'data1stSem' => $scholar_history_1st_semester,
+            'data2ndSem' => $scholar_history_2nd_semester,
+            'academic_year' => $academic_year
+        ]);
+    }
+
+    public function getReport(Request $request)
+    {
+        $scholarship = Scholarship::when($request->has('scholarship') && $request->scholarship != '', function($query) use ($request) {
+            $query->where('scholarship_name', $request->scholarship);
+        })->pluck('id')->all();
+
+        $scholar_history = ScholarHistory::when($request->has('academic_year') && $request->academic_year != 0, function($query) use ($request) {
+            $query->where('academic_year', $request->academic_year);
+        })
+        ->when($request->has('semester') && $request->semester != 0, function($query) use ($request) {
+            $query->where('semester', $request->semester);
+        })->pluck('scholar_id')->all();
+
+        $scholar = Scholar::whereIn('id', $scholar_history)
+                    ->whereIn('scholarship_id', $scholarship)
+                    ->when($request->has('department') && $request->department != '', function($query) use ($request) {
+                        $query->where('department', $request->department);
+                    })
+                    ->with('scholarHistories')
+                    ->with('scholarships')
+                    ->get();
+
+
+        return response()->json([
+            'status' => true,
+            'scholar' => $scholar
         ]);
     }
 }

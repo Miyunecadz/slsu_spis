@@ -132,10 +132,10 @@ class EventController extends Controller
         ]);
     }
 
-    public function update(Request $request)
+    public function update(Request $request, $id)
     {
         $params = $request->all();
-        $params['id'] = $request->id;
+        $params['id'] = $id;
         $validator = Validator::make($params, [
             // 'id' => 'exists:events,id',
             'title' => 'string|required',
@@ -153,6 +153,7 @@ class EventController extends Controller
             ]);
         }
 
+        // return response()->json($request->all());
         $event = Event::find($params['id'])->update($request->all());
         EventIndividual::where('event_id', $request->id)->delete();
 

@@ -89,4 +89,15 @@ class ScholarshipController extends Controller
             'messsage' => "Scholarship: " . $request->scholarship_name . " information has been updated"
         ]);
     }
+
+
+    public function getTotalScholars()
+    {
+        $scholarship = Scholarship::withCount('scholars')->get();
+
+        return response()->json([
+            'status' => true,
+            'total' =>$scholarship
+        ]);
+    }
 }

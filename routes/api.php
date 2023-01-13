@@ -49,6 +49,8 @@ Route::middleware('auth')->group(function(){
         Route::get('/', 'index');
         Route::get('/recipient', 'recipient'); //added for event recipient list
         Route::get('/academic-year', 'getAcademicYears');
+        Route::get('/generate-report', 'getReport');
+        Route::get('/semesterScholar', 'getTotalScholarsSemester');
         Route::get('/{id_number}', 'show');
         Route::post('/qualify', 'qualifyScholar');
         Route::post('/', 'store');
@@ -67,6 +69,7 @@ Route::middleware('auth')->group(function(){
     Route::prefix('scholarship')->controller(ScholarshipController::class)->group(function() {
         Route::get('/', 'index');
         Route::get('/counts', 'scholarCounts');
+        Route::get('/totalScholars', 'getTotalScholars');
         Route::post('/', 'store');
         Route::put('/{id}', 'update');
     });
